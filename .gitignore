@@ -1,0 +1,50 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Secrets & konfigurasi
+config.json
+.env
+*.env
+secrets.dart
+
+# Firebase
+firebase_options.dart
+google-services.json
+GoogleService-Info.plist
+
+# Signing keys
+key.properties
+*.jks
+*.keystore
+upload-keystore.jks
+
+# Path lokal
+android/local.properties
+android/key.properties
+ios/Pods/
+ios/.symlinks/
+
+# Database lokal (bisa berisi data emosi pribadi)
+*.db
+*.sqlite
+*.sqlite3
+*.hive
+*.isar
+
+# Lain-lain
+*.log
+.DS_Store
+Thumbs.db
+coverage/

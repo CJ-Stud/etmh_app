@@ -1,0 +1,35 @@
+// Firestore security rules for ETMH.
+//
+// Copy this into the Firebase Console → Firestore → Rules tab and
+// click "Publish".
+//
+// What these rules guarantee:
+//   • A signed-in user can only read/write documents under their own
+//     `users/{uid}/...` subtree.
+//   • Nobody can read another user's daily logs, even if they guess
+//     the doc IDs.
+//   • The `users/{uid}` document itself can be created/read by its
+//     owner (useful for future profile fields).
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Block all access by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // A user can fully manage their own profile + sub-collections.
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+
+      match /daily_logs/{logId} {
+        allow read, write: if request.auth != null
+                           && request.auth.uid == userId;
+      }
+    }
+  }
+}
