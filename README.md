@@ -1,6 +1,6 @@
-ETMH — Emotional Tracker for Mental Healt
+# ETMH — Emotional Tracker for Mental Health
 
-> Aplikasi pelacak kesehatan mental & emosi dengan pendamping AI konselor yang hangat dan empatik. Dibangun dengan Flutter dan Clean Architecture.
+> Ruang aman untuk mencatat emosi harian, melihat polanya dari waktu ke waktu, dan mendapatkan insight untuk menentukan langkah berikutnya. Dibangun dengan Flutter dan Clean Architecture.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)
@@ -11,9 +11,9 @@ ETMH — Emotional Tracker for Mental Healt
 ## Demo
 
 <!-- TODO: Ganti placeholder ini dengan screenshot / GIF aplikasimu.
-     Letakkan file gambar di folder screenshots/ lalu sesuaikan nama di bawah. -->
+     Letakkan file gambar di folder screenshots/ lalu sesuaikan namanya di bawah. -->
 <p align="center">
-  <img src="screenshots/home.png" width="240" alt="Home" />
+  <img src="screenshots/home.png" width="240" alt="Beranda" />
   <img src="screenshots/input_emosi.png" width="240" alt="Input Emosi (BottomSheet)" />
   <img src="screenshots/insight.png" width="240" alt="Insight Card" />
 </p>
@@ -22,18 +22,17 @@ ETMH — Emotional Tracker for Mental Healt
 
 ## Latar Belakang
 
-Banyak orang kesulitan mengenali pola emosinya dari
-     hari ke hari. ETMH memberi ruang aman untuk mencatat perasaan secara
-     cepat, lalu menyajikan ringkasan dan dukungan reflektif berbasis AI
-ETMH membantu pengguna mencatat kondisi emosi harian dan memahaminya melalui insight sederhana serta dialog dengan konselor AI.
+Banyak orang kesulitan mengenali apa yang sebenarnya mereka rasakan, dan sering bingung harus berbuat apa ketika emosi itu datang. ETMH hadir untuk menjawab masalah tersebut: sebuah pendamping yang membantu pengguna mencatat emosi harian secara cepat, meninjau kembali polanya seiring waktu, lalu memberi insight yang bisa ditindaklanjuti sebagai langkah berikutnya.
 
 ## Fitur Utama
 
-- Pencatatan emosi harian melalui **BottomSheet** yang nyaman dijangkau dengan satu tangan.
-- Ringkasan & insight kondisi emosional yang ditampilkan dalam bentuk **card**.
-- Pendamping AI berbasis **Google Gemini** dengan gaya bahasa yang hangat, empatik, dan santun.
-- Penyimpanan data lokal dengan penanganan error yang aman.
-
+- **Pencatatan emosi harian** melalui BottomSheet yang dirancang nyaman dijangkau dengan satu tangan, sehingga proses check-in terasa cepat dan tidak membebani.
+- **Riwayat emosi** untuk meninjau kembali perasaan dari hari ke hari.
+- **Grafik mood** yang memvisualisasikan tren emosi sehingga pola jadi lebih mudah dipahami.
+- **Kalender mood** untuk melihat sebaran kondisi emosi dalam satu bulan.
+- **Insight & rekomendasi langkah berikutnya** dari pendamping AI berbasis Google Gemini, dengan gaya bahasa yang hangat, empatik, dan santun.
+- **Pengingat pencatatan** lewat notifikasi agar kebiasaan mencatat emosi tetap terjaga.
+- **Akses darurat** untuk menghubungi pihak berwenang (mis. layanan Kemenkes) dengan cepat saat pengguna membutuhkan bantuan segera.
 
 ## Design System — The Healing Palette
 
@@ -46,55 +45,55 @@ Palet warna dirancang untuk memberi kesan tenang dan menenangkan, sesuai konteks
 | Dusty Lavender   | `#D6C7DE` | ![#D6C7DE](https://placehold.co/15x15/D6C7DE/D6C7DE.png) | Card informasi / insight|
 | Charcoal Grey    | `#333333` | ![#333333](https://placehold.co/15x15/333333/333333.png) | Teks utama              |
 
-Implementasi disentralisasi pada satu file tema (`lib/core/theme/app_colors.dart`) agar konsisten dan mudah dirawat.
+Implementasi disentralisasi pada satu file tema (`lib/core/theme/`) agar konsisten dan mudah dirawat — tidak ada warna yang ditulis langsung (hard-coded) di luar file ini.
 
 ## Arsitektur
 
-Proyek mengikuti **Clean Architecture** sederhana dengan tiga lapisan dan satu arah dependensi (Presentation → Domain → Data).
+Proyek mengikuti **Clean Architecture** sederhana dengan satu arah dependensi (Presentation -> Service -> Data).
 
 ```
-┌─────────────────────────────────────────────┐
-│                PRESENTATION                  │
-│   Widgets, Pages, BottomSheets, State Mgmt   │
-│           (Provider / BLoC)                  │
-└───────────────────┬─────────────────────────┘
-                    │ memanggil
-                    ▼
-┌─────────────────────────────────────────────┐
-│                   DOMAIN                     │
-│      Entities, Repository (abstract),        │
-│                  UseCases                    │
-└───────────────────┬─────────────────────────┘
-                    │ diimplementasikan oleh
-                    ▼
-┌─────────────────────────────────────────────┐
-│                    DATA                      │
-│   Models, Repository Impl, DataSources       │
-│   (Local DB, Gemini Service)  + try-catch    │
-└─────────────────────────────────────────────┘
++---------------------------------------------+
+|                PRESENTATION                 |
+|   Screens, Widgets, BottomSheets, Providers |
+|            (Provider / ChangeNotifier)      |
++----------------------+----------------------+
+                       | memanggil
+                       v
++---------------------------------------------+
+|                  SERVICES                   |
+|   Logika murni Dart (mis. Gemini Service)   |
++----------------------+----------------------+
+                       | menggunakan
+                       v
++---------------------------------------------+
+|                    DATA                     |
+|   Models, Repositories (Firestore + Hive)   |
+|              + error handling try-catch     |
++---------------------------------------------+
 ```
 
 Prinsip yang dipegang:
-- Lapisan dalam (Domain) tidak tahu apa-apa tentang lapisan luar.
-- Semua operasi database dibungkus `try-catch` dan mengembalikan hasil yang aman (mis. `Either`/`Result` atau melempar `Failure` yang tertangani).
-- State management dipakai **konsisten** (pilih salah satu: Provider **atau** BLoC).
+- Lapisan `core/` bebas dependensi — boleh diimpor siapa saja, tapi tidak mengimpor apa pun.
+- Lapisan `data/` mengenal Firestore & Hive, tapi tidak mengenal widget.
+- Semua operasi database dibungkus `try-catch` agar kegagalan tertangani dengan aman.
+- State management memakai **Provider** secara konsisten di seluruh aplikasi.
 
 ## Tech Stack
 
-| Kategori          | Teknologi                          |
-|-------------------|------------------------------------|
-| Framework         | Flutter (Dart)                     |
-| State Management  | Provider / BLoC                    |
-| AI                | Google Gemini API                  |
-| Database Lokal    | <!-- TODO: SQLite / Hive / Isar --> |
-
+| Kategori          | Teknologi                                  |
+|-------------------|--------------------------------------------|
+| Framework         | Flutter (Dart)                             |
+| State Management  | Provider                                   |
+| Database Lokal    | Hive                                       |
+| Backend & Auth    | Firebase (Authentication + Cloud Firestore)|
+| AI                | Google Gemini                              |
 
 ## Cara Menjalankan
 
 1. **Clone repositori**
    ```bash
-   git clone https://github.com/USERNAME/etmh.git
-   cd etmh
+   git clone https://github.com/USERNAME/etmh_app.git
+   cd etmh_app
    ```
 
 2. **Install dependencies**
@@ -102,50 +101,19 @@ Prinsip yang dipegang:
    flutter pub get
    ```
 
-3. **Siapkan API key Gemini**
-   Salin `config.example.json` menjadi `config.json`, lalu isi dengan key milikmu sendiri (dapatkan gratis di [Google AI Studio](https://aistudio.google.com/app/apikey)):
-   ```bash
-   cp config.example.json config.json
-   ```
-   ```json
-   {
-     "GEMINI_API_KEY": "punyamu_di_sini"
-   }
-   ```
-   > `config.json` sudah masuk `.gitignore` dan tidak akan ikut ter-commit.
+3. **Siapkan API key Gemini & konfigurasi Firebase**
+   API key Gemini tidak disertakan di repo demi keamanan. Dapatkan key gratis di [Google AI Studio](https://aistudio.google.com/app/apikey), lalu siapkan sesuai mekanisme konfigurasi pada proyek. File konfigurasi Firebase (`firebase_options.dart`) juga sengaja tidak disertakan; hasilkan ulang dengan menjalankan `flutterfire configure` pada proyek Firebase milikmu sendiri.
 
 4. **Jalankan aplikasi**
    ```bash
-   flutter run --dart-define-from-file=config.json
+   flutter run
    ```
 
 ## Keamanan & Privasi
 
-- API key tidak pernah di-hardcode; di-inject saat runtime via `--dart-define-from-file`.
-- Data emosi pengguna disimpan **lokal** di perangkat.
-- **Keterbatasan yang diketahui:** memanggil Gemini langsung dari sisi klien berarti key teoritis bisa diekstrak dari APK yang sudah dikompilasi. Untuk versi produksi, panggilan AI sebaiknya diproksikan melalui backend (mis. Cloud Functions) agar key tidak pernah berada di perangkat. Pada repositori portofolio ini hal tersebut sengaja disederhanakan.
-
-## Struktur Folder
-
-```
-lib/
-├── core/
-│   ├── theme/          # app_colors.dart (Healing Palette), text styles
-│   └── error/          # Failure / exception handling
-├── data/
-│   ├── datasources/    # local DB, gemini_service.dart
-│   ├── models/
-│   └── repositories/   # implementasi repository
-├── domain/
-│   ├── entities/
-│   ├── repositories/   # kontrak abstract
-│   └── usecases/
-└── presentation/
-    ├── pages/
-    ├── widgets/        # termasuk BottomSheet input emosi
-    └── providers/      # atau blocs/
-```
-
+- API key Gemini dan file konfigurasi Firebase tidak pernah ikut di-commit (lihat `.gitignore`).
+- Data emosi pengguna tersimpan secara lokal (Hive) dan disinkronkan ke Firestore milik pengguna.
+- Akses ke data dilindungi melalui **Firebase Security Rules**, bukan dengan menyembunyikan kunci konfigurasi.
 
 ## Lisensi
 
@@ -153,4 +121,4 @@ Dirilis di bawah Lisensi MIT. Lihat file [LICENSE](LICENSE) untuk detail.
 
 ---
 
-Dibuat oleh **Claudio** — https://www.linkedin.com/in/claudio-jafna-ibrani-319722218/
+Dibuat oleh **[Claudio Jafna Ibrani]** — [(https://www.linkedin.com/in/claudio-jafna-ibrani-319722218/)]
